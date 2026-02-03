@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MapPicker from "./components/MapPicker";
+import WeatherCard from "./components/WeatherCard";
 import { fetchWeather } from "./api";
 
 function getUnitSymbol(units) {
@@ -15,17 +16,17 @@ export default function App() {
   const [error, setError] = useState("");
   const [data, setData] = useState(null);
 
-  // for subtle animation when new data arrives
-  const [animateKey, setAnimateKey] = useState(0);
-
   async function onGetWeather() {
     if (!coords) return;
     setLoading(true);
     setError("");
     try {
-      const res = await fetchWeather({ lat: coords.lat, lon: coords.lon, units });
+      const res = await fetchWeather({
+        lat: coords.lat,
+        lon: coords.lon,
+        units,
+      });
       setData(res);
-      setAnimateKey((k) => k + 1);
     } catch (e) {
       setError(e?.message || String(e));
       setData(null);
@@ -37,7 +38,6 @@ export default function App() {
   const current = data?.current;
   const unit = getUnitSymbol(units);
 
-  // build OpenWeather icon URL
   const iconUrl = current?.icon
     ? `https://openweathermap.org/img/wn/${current.icon}@2x.png`
     : null;
@@ -73,49 +73,16 @@ export default function App() {
 
         {error && <div className="error">{error}</div>}
 
-        {current && (
-          <div key={animateKey} className="card animIn">
-            <div className="weatherTop">
-              <div className="tempBlock">
-                <div className="big">
-                  {current.temp ?? "—"}
-                  <span className="unit">{unit}</span>
-                </div>
-                <div className="desc">{current.description || "—"}</div>
-              </div>
-
-              {iconUrl && (
-                <img
-                  className="wxIcon"
-                  src={iconUrl}
-                  alt={current.description || "weather icon"}
-                  loading="lazy"
-                />
-              )}
-            </div>
-
-            <div className="grid">
-              <div>
-                <div className="k">Feels</div>
-                <div className="v">
-                  {current.feels_like ?? "—"} {unit}
-                </div>
-              </div>
-              <div>
-                <div className="k">Humidity</div>
-                <div className="v">{current.humidity ?? "—"}%</div>
-              </div>
-              <div>
-                <div className="k">Wind</div>
-                <div className="v">{current.wind_speed ?? "—"}</div>
-              </div>
-              <div>
-                <div className="k">Icon</div>
-                <div className="v">{current.icon ?? "—"}</div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* 👇 כאן רק קומפוננטה, לא HTML */}
+        <WeatherCard
+          current={current}
+          iconUrl={iconUrl}
+          units={units}
+          unitSymbol={unit}
+          coords={coords}
+          loading={loading}
+          onRefresh={onGetWeather}
+        />
       </div>
     </div>
   );
