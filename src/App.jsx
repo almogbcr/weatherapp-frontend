@@ -1,6 +1,7 @@
 const MAX_REQUESTS = 999;
 const STORAGE_KEY = "weather_request_count";
 
+
 import { useState } from "react";
 import MapPicker from "./components/MapPicker";
 import WeatherCard from "./components/WeatherCard";
@@ -32,6 +33,9 @@ export default function App() {
 
   const [data, setData] = useState(null);
   const [place, setPlace] = useState("");
+
+  const requestCount = getRequestCount();
+
 
   async function onGetWeather() {
     if (!coords) return;
@@ -102,6 +106,7 @@ export default function App() {
         iconUrl={iconUrl}
         unitSymbol={unitSymbol}
         onGetWeather={onGetWeather}
+        requestCount={requestCount}
       />
     </div>
   );

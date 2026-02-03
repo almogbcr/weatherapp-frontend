@@ -22,6 +22,7 @@ export default function WeatherCard({
   iconUrl,
   unitSymbol,
   onGetWeather,
+  requestCount,
 }) {
   const theme = getThemeClass(current?.icon);
 
@@ -45,7 +46,7 @@ export default function WeatherCard({
 
           <button
             className="weatherBtn"
-            disabled={!coords || loading}
+            disabled={!coords || loading || requestCount >= 999}
             onClick={onGetWeather}
             title={!coords ? "Pick a location on the map" : "Get weather"}
           >
