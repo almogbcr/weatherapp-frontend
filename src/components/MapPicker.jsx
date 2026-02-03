@@ -33,10 +33,15 @@ export default function MapPicker({ value, onPick }) {
       <MapContainer
         center={[31.5, 34.8]}
         zoom={5}
-        className="map"
+
+        /* 🔒 חשוב – מגבלות תנועה וזום */
+        minZoom={4}
+        maxZoom={17}
         worldCopyJump={true}
         maxBounds={[[-85, -180], [85, 180]]}
         maxBoundsViscosity={1.0}
+
+        className="map"
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
