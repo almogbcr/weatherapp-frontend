@@ -185,3 +185,44 @@ select:focus {
 .leaflet-container {
   background: #0b1024;
 }
+/* --- Weather card top layout --- */
+.weatherTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tempBlock {
+  min-width: 0;
+}
+
+.wxIcon {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
+  opacity: 0.95;
+}
+
+/* --- Subtle enter animation for new weather --- */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animIn {
+  animation: fadeUp 240ms ease-out;
+}
+
+/* --- Button micro-interaction (optional, subtle) --- */
+.btn:active {
+  transform: translateY(0px) scale(0.99);
+}
+
