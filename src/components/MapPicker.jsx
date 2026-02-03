@@ -5,6 +5,7 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
+/* Fix Leaflet default marker icons (Vite) */
 const DefaultIcon = new L.Icon({
   iconRetinaUrl: markerIcon2x,
   iconUrl: markerIcon,
@@ -13,10 +14,14 @@ const DefaultIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
 
+/* Handle map clicks */
 function ClickHandler({ onPick }) {
   useMapEvents({
     click(e) {
-      onPick({ lat: e.latlng.lat, lon: e.latlng.lng });
+      onPick({
+        lat: e.latlng.lat,
+        lon: e.latlng.lng,
+      });
     },
   });
   return null;
@@ -25,12 +30,22 @@ function ClickHandler({ onPick }) {
 export default function MapPicker({ value, onPick }) {
   return (
     <div className="mapWrap">
-      <MapContainer center={[31.5, 34.8]} zoom={5} className="map">
+      <MapContainer
+        center={[31.5, 34.8]}
+        zoom={5}
+        className="map"
+        worldCopyJump={true}
+        maxBounds={[[-85, -180], [85, 180]]}
+        maxBoundsViscosity={1.0}
+      >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="© OpenStreetMap"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution="© OpenStreetMap © CARTO"
+          noWrap={true}
         />
+
         <ClickHandler onPick={onPick} />
+
         {value && (
           <Marker
             position={[value.lat, value.lon]}
@@ -39,7 +54,10 @@ export default function MapPicker({ value, onPick }) {
             eventHandlers={{
               dragend: (e) => {
                 const p = e.target.getLatLng();
-                onPick({ lat: p.lat, lon: p.lng });
+                onPick({
+                  lat: p.lat,
+                  lon: p.lng,
+                });
               },
             }}
           />
