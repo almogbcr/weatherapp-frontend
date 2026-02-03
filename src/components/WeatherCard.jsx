@@ -12,6 +12,7 @@ function getThemeClass(icon) {
 }
 
 export default function WeatherCard({
+  place,
   coords,
   units,
   setUnits,
@@ -24,17 +25,18 @@ export default function WeatherCard({
 }) {
   const theme = getThemeClass(current?.icon);
 
+  const titleText = place
+    ? place
+    : coords
+      ? `lat ${coords.lat.toFixed(5)}, lon ${coords.lon.toFixed(5)}`
+      : "Click on the map";
+
   return (
     <div className="weatherDock">
       <div className={`weatherCard ${theme}`}>
         <div className="weatherHeader">
           <div className="weatherTitle">
-            <div className="weatherPlace">
-              {coords
-                ? `lat ${coords.lat.toFixed(5)}, lon ${coords.lon.toFixed(5)}`
-                : "Click on the map"}
-            </div>
-
+            <div className="weatherPlace">{titleText}</div>
             <div className="weatherMeta">
               <span>{units}</span>
               <span>{current?.description || "No data yet"}</span>

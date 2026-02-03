@@ -13,3 +13,17 @@ export async function fetchWeather({ lat, lon, units = "metric" }) {
   }
   return r.json();
 }
+export async function reverseGeocode({ lat, lon }) {
+  // OpenStreetMap Nominatim (no key). For production, add caching/throttling.
+  const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+  const res = await fetch(url, {
+    headers: {
+      "Accept": "application/json",
+      // Some services like having a UA; browser may ignore, but fine:
+      "User-Agent": "weatherapp-frontend",
+    },
+  });
+  if (!res.ok) throw new Error(`reverseGeocode failed: ${res.status}`);
+  return res.json();
+}
+

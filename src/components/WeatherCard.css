@@ -155,6 +155,12 @@
   border-color: rgba(255,255,255,.22);
 }
 
+/* Make dropdown options readable (important on Windows/Chrome) */
+.wcSelect option{
+  background: #0b1220;
+  color: #ffffff;
+}
+
 .wcError{
   margin-top: 10px;
   font-size: 12.5px;
@@ -211,8 +217,8 @@
   width: 74px;
   height: 74px;
   border-radius: 18px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.35);   /* darker*/
+  border: 1px solid rgba(255,255,255,.18);
   display:grid;
   place-items:center;
   overflow:hidden;
@@ -222,6 +228,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+
+  /* make light icons visible */
+  filter:
+      contrast(1.4)
+  brightness(0.95)
+  drop-shadow(0 2px 6px rgba(0,0,0,.6));
 }
 
 .weatherSide{

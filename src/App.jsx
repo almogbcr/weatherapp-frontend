@@ -1,7 +1,7 @@
 import { useState } from "react";
 import MapPicker from "./components/MapPicker";
 import WeatherCard from "./components/WeatherCard";
-import { fetchWeather } from "./api";
+import { fetchWeather, reverseGeocode } from "./api";
 
 function getUnitSymbol(units) {
   if (units === "metric") return "°C";
@@ -12,24 +12,47 @@ function getUnitSymbol(units) {
 export default function App() {
   const [coords, setCoords] = useState(null);
   const [units, setUnits] = useState("metric");
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const [data, setData] = useState(null);
+  const [place, setPlace] = useState("");
 
   async function onGetWeather() {
     if (!coords) return;
+
     setLoading(true);
     setError("");
+
     try {
+      // 1) Weather (only on button click)
       const res = await fetchWeather({
         lat: coords.lat,
         lon: coords.lon,
         units,
       });
       setData(res);
+
+      // 2) Place name (only on button click)
+      try {
+        const j = await reverseGeocode({ lat: coords.lat, lon: coords.lon });
+        const name =
+          j?.address?.city ||
+          j?.address?.town ||
+          j?.address?.village ||
+          j?.address?.municipality ||
+          j?.address?.state ||
+          j?.display_name ||
+          "";
+        setPlace(name);
+      } catch {
+        setPlace("");
+      }
     } catch (e) {
       setError(e?.message || String(e));
       setData(null);
+      setPlace("");
     } finally {
       setLoading(false);
     }
@@ -47,6 +70,7 @@ export default function App() {
       <MapPicker value={coords} onPick={setCoords} />
 
       <WeatherCard
+        place={place}
         coords={coords}
         units={units}
         setUnits={setUnits}
