@@ -48,9 +48,19 @@ export default function WeatherCard({
             className="weatherBtn"
             disabled={!coords || loading || requestCount >= 999}
             onClick={onGetWeather}
-            title={!coords ? "Pick a location on the map" : "Get weather"}
-          >
-            {loading ? "Loading..." : "Get Weather"}
+             title={
+                !coords
+                  ? "Pick a location on the map"
+                  : requestCount >= 999
+                    ? "Daily request limit reached (999)"
+                    : "Get weather"
+              }
+>           
+              {loading
+                ? "Loading..."
+                : requestCount >= 999
+                  ? "Limit reached"
+                  : "Get Weather"}
           </button>
         </div>
 
