@@ -1,28 +1,15 @@
-const MAX_REQUESTS = 999;
-const STORAGE_KEY = "weather_request_count";
-
-
 import { useState } from "react";
 import MapPicker from "./components/MapPicker";
 import WeatherCard from "./components/WeatherCard";
 import { fetchWeather, reverseGeocode } from "./api";
+
+const FALLBACK_DAILY_LIMIT = 999;
 
 function getUnitSymbol(units) {
   if (units === "metric") return "°C";
   if (units === "imperial") return "°F";
   return "K";
 }
-
-function getRequestCount() {
-  return Number(localStorage.getItem(STORAGE_KEY) || 0);
-}
-
-function incrementRequestCount() {
-  const next = getRequestCount() + 1;
-  localStorage.setItem(STORAGE_KEY, String(next));
-  return next;
-}
-
 
 export default function App() {
   const [coords, setCoords] = useState(null);
@@ -33,18 +20,15 @@ export default function App() {
 
   const [data, setData] = useState(null);
   const [place, setPlace] = useState("");
-
-  const requestCount = getRequestCount();
+  const [rateInfo, setRateInfo] = useState(null);
+  const requestCount = rateInfo
+    ? Math.max(rateInfo.ip_count, rateInfo.device_count, rateInfo.pair_count)
+    : 0;
+  const dailyLimit = rateInfo?.limit ?? FALLBACK_DAILY_LIMIT;
 
 
   async function onGetWeather() {
     if (!coords) return;
-
-     const count = getRequestCount();
-  if (count >= MAX_REQUESTS) {
-    setError("Daily request limit reached (999).");
-    return;
-  }
 
     setLoading(true);
     setError("");
@@ -57,8 +41,7 @@ export default function App() {
         units,
       });
       setData(res);
-
-      await incrementRequestCount();
+      if (res?.rate_limit) setRateInfo(res.rate_limit);
 
       // 2) Place name (only on button click)
       try {
@@ -77,6 +60,7 @@ export default function App() {
       }
     } catch (e) {
       setError(e?.message || String(e));
+      if (e?.rateLimit) setRateInfo(e.rateLimit);
       setData(null);
       setPlace("");
     } finally {
@@ -107,6 +91,7 @@ export default function App() {
         unitSymbol={unitSymbol}
         onGetWeather={onGetWeather}
         requestCount={requestCount}
+        dailyLimit={dailyLimit}
       />
     </div>
   );

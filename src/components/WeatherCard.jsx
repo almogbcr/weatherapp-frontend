@@ -23,8 +23,10 @@ export default function WeatherCard({
   unitSymbol,
   onGetWeather,
   requestCount,
+  dailyLimit,
 }) {
   const theme = getThemeClass(current?.icon);
+  const effectiveLimit = Number.isFinite(dailyLimit) ? dailyLimit : 999;
 
   const titleText = place
     ? place
@@ -46,19 +48,19 @@ export default function WeatherCard({
 
           <button
             className="weatherBtn"
-            disabled={!coords || loading || requestCount >= 999}
+            disabled={!coords || loading || requestCount >= effectiveLimit}
             onClick={onGetWeather}
              title={
                 !coords
                   ? "Pick a location on the map"
-                  : requestCount >= 999
-                    ? "Daily request limit reached (999)"
+                  : requestCount >= effectiveLimit
+                    ? `Daily request limit reached (${effectiveLimit})`
                     : "Get weather"
               }
 >           
               {loading
                 ? "Loading..."
-                : requestCount >= 999
+                : requestCount >= effectiveLimit
                   ? "Limit reached"
                   : "Get Weather"}
           </button>
