@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const BASE = "/api";
 const DEVICE_ID_KEY = "weather_device_id";
 
 function getDeviceId() {
