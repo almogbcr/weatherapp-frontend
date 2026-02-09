@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import MapPicker from "./components/MapPicker";
 import WeatherCard from "./components/WeatherCard";
 import { fetchWeather, reverseGeocode } from "./api";
@@ -6,8 +6,8 @@ import { fetchWeather, reverseGeocode } from "./api";
 const FALLBACK_DAILY_LIMIT = 999;
 
 function getUnitSymbol(units) {
-  if (units === "metric") return "°C";
-  if (units === "imperial") return "°F";
+  if (units === "metric") return `${String.fromCharCode(176)}C`;
+  if (units === "imperial") return `${String.fromCharCode(176)}F`;
   return "K";
 }
 
@@ -96,3 +96,6 @@ export default function App() {
     </div>
   );
 }
+
+
+
