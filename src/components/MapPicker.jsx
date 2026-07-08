@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -27,6 +28,19 @@ function ClickHandler({ onPick }) {
   return null;
 }
 
+function MapFocus({ value }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!value) return;
+    map.flyTo([value.lat, value.lon], Math.max(map.getZoom(), 10), {
+      duration: 0.7,
+    });
+  }, [map, value]);
+
+  return null;
+}
+
 export default function MapPicker({ value, onPick }) {
   return (
     <div className="mapWrap">
@@ -50,6 +64,7 @@ export default function MapPicker({ value, onPick }) {
         />
 
         <ClickHandler onPick={onPick} />
+        <MapFocus value={value} />
 
         {value && (
           <Marker

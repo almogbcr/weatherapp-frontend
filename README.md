@@ -6,6 +6,7 @@ React + Vite frontend for the Weather App project. The app lets a user pick any 
 
 - Shows an interactive Leaflet map.
 - Lets the user click or drag a marker to choose coordinates.
+- Lets the user search for a city, country, or address and select a matching result.
 - Fetches current weather from the backend.
 - Fetches a readable place name for the selected coordinates.
 - Displays place name, temperature, weather condition, humidity, wind, and feels-like temperature.
@@ -29,6 +30,7 @@ The frontend API client uses relative URLs:
 
 ```text
 /api/weather
+/api/geocode
 /api/reverse-geocode
 ```
 

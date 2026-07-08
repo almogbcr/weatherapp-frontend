@@ -19,7 +19,7 @@ function getDeviceId() {
 }
 
 export async function fetchWeather({ lat, lon, units = "metric" }) {
-const url = `${BASE}/weather?lat=${lat}&lon=${lon}&units=${units}`;
+  const url = `${BASE}/weather?lat=${lat}&lon=${lon}&units=${units}`;
 
   const deviceId = getDeviceId();
   const res = await fetch(url.toString(), {
@@ -48,5 +48,14 @@ export async function reverseGeocode({ lat, lon }) {
   const url = `${BASE}/reverse-geocode?lat=${lat}&lon=${lon}`;
   const res = await fetch(url, { headers: { Accept: "application/json" } });
   if (!res.ok) throw new Error(`reverseGeocode failed: ${res.status}`);
+  return res.json();
+}
+
+export async function searchLocations(query) {
+  const params = new URLSearchParams({ q: query, limit: "5" });
+  const res = await fetch(`${BASE}/geocode?${params.toString()}`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`searchLocations failed: ${res.status}`);
   return res.json();
 }

@@ -109,6 +109,100 @@
   padding: 0 18px 14px;
 }
 
+.searchForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.searchInput {
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.94);
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.searchInput:focus {
+  border-color: rgba(125, 211, 252, 0.62);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+}
+
+.searchBtn {
+  appearance: none;
+  min-width: 0;
+  min-height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.94);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 720;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.searchBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.searchBtn:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.searchResults {
+  display: grid;
+  gap: 8px;
+  max-height: 210px;
+  margin: 0 0 12px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.searchResult {
+  appearance: none;
+  width: 100%;
+  min-height: 54px;
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.065);
+  color: rgba(255, 255, 255, 0.93);
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.searchResult:hover {
+  border-color: rgba(125, 211, 252, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.searchResultName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 680;
+}
+
+.searchResultCoords {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
 .wcRow {
   display: grid;
   grid-template-columns: 64px 1fr;
@@ -318,6 +412,10 @@
 
   .weatherBtn {
     width: 100%;
+  }
+
+  .searchForm {
+    grid-template-columns: 1fr;
   }
 
   .weatherBody {

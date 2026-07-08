@@ -1,7 +1,7 @@
 ﻿import { useState } from "react";
 import MapPicker from "./components/MapPicker";
 import WeatherCard from "./components/WeatherCard";
-import { fetchWeather, reverseGeocode } from "./api";
+import { fetchWeather, reverseGeocode, searchLocations } from "./api";
 
 const FALLBACK_DAILY_LIMIT = 999;
 
@@ -17,6 +17,10 @@ export default function App() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchError, setSearchError] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [locationResults, setLocationResults] = useState([]);
 
   const [data, setData] = useState(null);
   const [place, setPlace] = useState("");
@@ -25,6 +29,45 @@ export default function App() {
     ? Math.max(rateInfo.ip_count, rateInfo.device_count, rateInfo.pair_count)
     : 0;
   const dailyLimit = rateInfo?.limit ?? FALLBACK_DAILY_LIMIT;
+
+  async function onSearchLocation(event) {
+    event.preventDefault();
+
+    const query = searchQuery.trim();
+    if (query.length < 2) {
+      setSearchError("Enter at least 2 characters.");
+      setLocationResults([]);
+      return;
+    }
+
+    setSearching(true);
+    setSearchError("");
+
+    try {
+      const results = await searchLocations(query);
+      setLocationResults(results);
+      if (!results.length) setSearchError("No matching locations found.");
+    } catch (e) {
+      setSearchError(e?.message || String(e));
+      setLocationResults([]);
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  function onSelectLocation(result) {
+    const lat = Number(result.lat);
+    const lon = Number(result.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+    setCoords({ lat, lon });
+    setPlace(result.display_name || "");
+    setData(null);
+    setError("");
+    setSearchError("");
+    setLocationResults([]);
+    setSearchQuery(result.display_name || searchQuery);
+  }
 
   async function onGetWeather() {
     if (!coords) return;
@@ -83,6 +126,13 @@ export default function App() {
         coords={coords}
         units={units}
         setUnits={setUnits}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        searching={searching}
+        searchError={searchError}
+        locationResults={locationResults}
+        onSearchLocation={onSearchLocation}
+        onSelectLocation={onSelectLocation}
         loading={loading}
         error={error}
         current={current}

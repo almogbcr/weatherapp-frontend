@@ -16,6 +16,13 @@ export default function WeatherCard({
   coords,
   units,
   setUnits,
+  searchQuery,
+  setSearchQuery,
+  searching,
+  searchError,
+  locationResults,
+  onSearchLocation,
+  onSelectLocation,
   loading,
   error,
   current,
@@ -73,6 +80,40 @@ export default function WeatherCard({
         </div>
 
         <div className="weatherControls">
+          <form className="searchForm" onSubmit={onSearchLocation}>
+            <input
+              className="searchInput"
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search city, country, or address"
+              autoComplete="off"
+            />
+            <button className="searchBtn" type="submit" disabled={searching}>
+              {searching ? "Searching..." : "Search"}
+            </button>
+          </form>
+
+          {searchError ? <div className="wcError">{searchError}</div> : null}
+
+          {locationResults.length ? (
+            <div className="searchResults">
+              {locationResults.map((result) => (
+                <button
+                  className="searchResult"
+                  key={`${result.place_id}-${result.lat}-${result.lon}`}
+                  type="button"
+                  onClick={() => onSelectLocation(result)}
+                >
+                  <span className="searchResultName">{result.display_name}</span>
+                  <span className="searchResultCoords">
+                    {Number(result.lat).toFixed(5)}, {Number(result.lon).toFixed(5)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+
           <div className="wcRow">
             <div className="wcLabel">Units</div>
             <select
