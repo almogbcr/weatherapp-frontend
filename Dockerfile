@@ -1,3 +1,4 @@
+# syn
 # BUILD
 # get Node.js image for frontend build
 FROM node:20-alpine AS build
@@ -11,8 +12,7 @@ LABEL env="dev"
 #Set the working directory
 WORKDIR /opt/weatherapp/frontend
 #Copy the requirements file to the working directory
-COPY package.json .
-COPY package-lock.json .
+COPY package*.json ./
 #Install the dependencies
 RUN npm ci
 #Copy the rest of the application code to the working directory
