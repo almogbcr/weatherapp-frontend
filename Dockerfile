@@ -7,7 +7,7 @@ FROM node:20-alpine AS build
 LABEL maintainer="almog"
 LABEL description="React frontend for weather app"
 LABEL version="1.0.0"
-LABEL env="dev"
+LABEL env="production"
 
 #Set the working directory
 WORKDIR /opt/weatherapp/frontend
