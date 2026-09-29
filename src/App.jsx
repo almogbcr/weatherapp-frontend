@@ -1,13 +1,25 @@
-﻿import { useState } from "react";
+﻿import { useRef, useState } from "react";
+
 import MapPicker from "./components/MapPicker";
 import WeatherCard from "./components/WeatherCard";
-import { fetchWeather, reverseGeocode, searchLocations } from "./api";
+
+import {
+  fetchWeather,
+  reverseGeocodeMapTiler,
+  searchLocations,
+} from "./api";
 
 const FALLBACK_DAILY_LIMIT = 999;
 
 function getUnitSymbol(units) {
-  if (units === "metric") return `${String.fromCharCode(176)}C`;
-  if (units === "imperial") return `${String.fromCharCode(176)}F`;
+  if (units === "metric") {
+    return `${String.fromCharCode(176)}C`;
+  }
+
+  if (units === "imperial") {
+    return `${String.fromCharCode(176)}F`;
+  }
+
   return "K";
 }
 
@@ -16,6 +28,8 @@ export default function App() {
   const [units, setUnits] = useState("metric");
 
   const [loading, setLoading] = useState(false);
+  const [resolvingPlace, setResolvingPlace] = useState(false);
+
   const [error, setError] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +40,8 @@ export default function App() {
   const [data, setData] = useState(null);
   const [place, setPlace] = useState("");
   const [rateInfo, setRateInfo] = useState(null);
+
+  const reverseControllerRef = useRef(null);
 
   const requestCount = rateInfo
     ? Math.max(
@@ -46,25 +62,45 @@ export default function App() {
       return;
     }
 
+    if (reverseControllerRef.current) {
+      reverseControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    reverseControllerRef.current = controller;
+
     setCoords({ lat, lon });
     setPlace("");
+    setResolvingPlace(true);
+
     setData(null);
     setError("");
     setSearchError("");
     setLocationResults([]);
 
     try {
-      const result = await reverseGeocode({ lat, lon });
+      const result = await reverseGeocodeMapTiler({
+        lat,
+        lon,
+        signal: controller.signal,
+      });
 
       const name =
-        result?.display_name_en ||
-        result?.name ||
         result?.display_name ||
-        "";
+        result?.name ||
+        "Selected location";
 
       setPlace(name);
-    } catch {
-      setPlace("");
+    } catch (e) {
+      if (e?.name === "AbortError") {
+        return;
+      }
+
+      setPlace("Selected location");
+    } finally {
+      if (reverseControllerRef.current === controller) {
+        setResolvingPlace(false);
+      }
     }
   }
 
@@ -106,27 +142,25 @@ export default function App() {
       return;
     }
 
-    setCoords({ lat, lon });
+    if (reverseControllerRef.current) {
+      reverseControllerRef.current.abort();
+    }
 
     const name =
       result.display_name_en ||
       result.name ||
       result.display_name ||
-      "";
+      "Selected location";
 
+    setCoords({ lat, lon });
     setPlace(name);
+    setResolvingPlace(false);
 
     setData(null);
     setError("");
     setSearchError("");
     setLocationResults([]);
-
-    setSearchQuery(
-      result.display_name_en ||
-      result.name ||
-      result.display_name ||
-      searchQuery
-    );
+    setSearchQuery(name);
   }
 
   async function onGetWeather() {
@@ -148,30 +182,6 @@ export default function App() {
 
       if (res?.rate_limit) {
         setRateInfo(res.rate_limit);
-      }
-
-      /*
-       * Refresh the place name as well.
-       * This keeps the card consistent even if the location
-       * came from somewhere other than a map click.
-       */
-      try {
-        const result = await reverseGeocode({
-          lat: coords.lat,
-          lon: coords.lon,
-        });
-
-        const name =
-          result?.display_name_en ||
-          result?.name ||
-          result?.display_name ||
-          "";
-
-        if (name) {
-          setPlace(name);
-        }
-      } catch {
-        // Keep the current place if reverse geocoding fails.
       }
     } catch (e) {
       setError(e?.message || String(e));
@@ -203,6 +213,7 @@ export default function App() {
       <WeatherCard
         place={place}
         coords={coords}
+        resolvingPlace={resolvingPlace}
         units={units}
         setUnits={setUnits}
         searchQuery={searchQuery}
