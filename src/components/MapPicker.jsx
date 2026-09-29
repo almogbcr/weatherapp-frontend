@@ -46,7 +46,7 @@ export default function MapPicker({ value, onPick }) {
       >
         <TileLayer
           url={`https://api.maptiler.com/maps/streets-v4/{z}/{x}/{y}.png?key=${mapTilerKey}`}
-          attribution="© MapTiler © OpenStreetMap contributors"
+          attribution="Almog Bachar Weather App | <a href='https://www.maptiler.com/copyright/' target='_blank'>MapTiler</a> | <a href='https://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap</a> contributors"
           tileSize={512}
           zoomOffset={-1}
           noWrap={true}
