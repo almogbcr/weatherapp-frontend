@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -8,7 +7,6 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 const mapTilerKey = import.meta.env.VITE_MAPTILER_API_KEY;
 
-/* Fix Leaflet default marker icons (Vite) */
 const DefaultIcon = new L.Icon({
   iconRetinaUrl: markerIcon2x,
   iconUrl: markerIcon,
@@ -17,7 +15,6 @@ const DefaultIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
 
-/* Handle map clicks */
 function ClickHandler({ onPick }) {
   useMapEvents({
     click(e) {
@@ -27,18 +24,6 @@ function ClickHandler({ onPick }) {
       });
     },
   });
-  return null;
-}
-
-function MapFocus({ value }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!value) return;
-    map.flyTo([value.lat, value.lon], Math.max(map.getZoom(), 10), {
-      duration: 0.7,
-    });
-  }, [map, value]);
 
   return null;
 }
@@ -49,14 +34,14 @@ export default function MapPicker({ value, onPick }) {
       <MapContainer
         center={[31.5, 34.8]}
         zoom={5}
-
-        /* 🔒 חשוב – מגבלות תנועה וזום */
         minZoom={4}
         maxZoom={17}
         worldCopyJump={true}
-        maxBounds={[[-85, -180], [85, 180]]}
+        maxBounds={[
+          [-85, -180],
+          [85, 180],
+        ]}
         maxBoundsViscosity={1.0}
-
         className="map"
       >
         <TileLayer
@@ -68,19 +53,19 @@ export default function MapPicker({ value, onPick }) {
         />
 
         <ClickHandler onPick={onPick} />
-        <MapFocus value={value} />
 
         {value && (
           <Marker
             position={[value.lat, value.lon]}
             icon={DefaultIcon}
-            draggable
+            draggable={true}
             eventHandlers={{
               dragend: (e) => {
-                const p = e.target.getLatLng();
+                const position = e.target.getLatLng();
+
                 onPick({
-                  lat: p.lat,
-                  lon: p.lng,
+                  lat: position.lat,
+                  lon: position.lng,
                 });
               },
             }}
