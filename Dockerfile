@@ -17,6 +17,9 @@ COPY package*.json ./
 RUN npm ci
 #Copy the rest of the application code to the working directory
 COPY . .
+
+ARG VITE_MAPTILER_API_KEY
+ENV VITE_MAPTILER_API_KEY=$VITE_MAPTILER_API_KEY
 #Build the React application
 RUN npm run build
 

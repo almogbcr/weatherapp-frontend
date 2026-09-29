@@ -6,6 +6,8 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
+const mapTilerKey = import.meta.env.VITE_MAPTILER_API_KEY;
+
 /* Fix Leaflet default marker icons (Vite) */
 const DefaultIcon = new L.Icon({
   iconRetinaUrl: markerIcon2x,
@@ -58,8 +60,10 @@ export default function MapPicker({ value, onPick }) {
         className="map"
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="© OpenStreetMap contributors"
+          url={`https://api.maptiler.com/maps/streets-v4/{z}/{x}/{y}.png?key=${mapTilerKey}`}
+          attribution="© MapTiler © OpenStreetMap contributors"
+          tileSize={512}
+          zoomOffset={-1}
           noWrap={true}
         />
 

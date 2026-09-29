@@ -37,3 +37,5 @@ jobs:
           file: ./Dockerfile
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: almogbcr/weatherapp-frontend:${{ env.SHORT_SHA }}
+          build-args: |
+            VITE_MAPTILER_API_KEY=${{ secrets.MAPTILER_API_KEY }}
