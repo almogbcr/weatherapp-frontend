@@ -58,8 +58,8 @@ export default function MapPicker({ value, onPick }) {
         className="map"
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution="© OpenStreetMap © CARTO"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="© OpenStreetMap contributors"
           noWrap={true}
         />
 
