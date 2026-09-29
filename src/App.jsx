@@ -17,6 +17,7 @@ export default function App() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchError, setSearchError] = useState("");
   const [searching, setSearching] = useState(false);
@@ -25,15 +26,53 @@ export default function App() {
   const [data, setData] = useState(null);
   const [place, setPlace] = useState("");
   const [rateInfo, setRateInfo] = useState(null);
+
   const requestCount = rateInfo
-    ? Math.max(rateInfo.ip_count, rateInfo.device_count, rateInfo.pair_count)
+    ? Math.max(
+        rateInfo.ip_count,
+        rateInfo.device_count,
+        rateInfo.pair_count
+      )
     : 0;
-  const dailyLimit = rateInfo?.limit ?? FALLBACK_DAILY_LIMIT;
+
+  const dailyLimit =
+    rateInfo?.limit ?? FALLBACK_DAILY_LIMIT;
+
+  async function onMapPick(position) {
+    const lat = Number(position.lat);
+    const lon = Number(position.lon);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+      return;
+    }
+
+    setCoords({ lat, lon });
+    setPlace("");
+    setData(null);
+    setError("");
+    setSearchError("");
+    setLocationResults([]);
+
+    try {
+      const result = await reverseGeocode({ lat, lon });
+
+      const name =
+        result?.display_name_en ||
+        result?.name ||
+        result?.display_name ||
+        "";
+
+      setPlace(name);
+    } catch {
+      setPlace("");
+    }
+  }
 
   async function onSearchLocation(event) {
     event.preventDefault();
 
     const query = searchQuery.trim();
+
     if (query.length < 2) {
       setSearchError("Enter at least 2 characters.");
       setLocationResults([]);
@@ -45,8 +84,12 @@ export default function App() {
 
     try {
       const results = await searchLocations(query);
+
       setLocationResults(results);
-      if (!results.length) setSearchError("No matching locations found.");
+
+      if (!results.length) {
+        setSearchError("No matching locations found.");
+      }
     } catch (e) {
       setSearchError(e?.message || String(e));
       setLocationResults([]);
@@ -58,53 +101,86 @@ export default function App() {
   function onSelectLocation(result) {
     const lat = Number(result.lat);
     const lon = Number(result.lon);
-    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+      return;
+    }
 
     setCoords({ lat, lon });
-    setPlace(result.display_name || "");
+
+    const name =
+      result.display_name_en ||
+      result.name ||
+      result.display_name ||
+      "";
+
+    setPlace(name);
+
     setData(null);
     setError("");
     setSearchError("");
     setLocationResults([]);
-    setSearchQuery(result.display_name || searchQuery);
+
+    setSearchQuery(
+      result.display_name_en ||
+      result.name ||
+      result.display_name ||
+      searchQuery
+    );
   }
 
   async function onGetWeather() {
-    if (!coords) return;
+    if (!coords) {
+      return;
+    }
 
     setLoading(true);
     setError("");
 
     try {
-      // 1) Weather (only on button click)
       const res = await fetchWeather({
         lat: coords.lat,
         lon: coords.lon,
         units,
       });
-      setData(res);
-      if (res?.rate_limit) setRateInfo(res.rate_limit);
 
-      // 2) Place name (only on button click)
+      setData(res);
+
+      if (res?.rate_limit) {
+        setRateInfo(res.rate_limit);
+      }
+
+      /*
+       * Refresh the place name as well.
+       * This keeps the card consistent even if the location
+       * came from somewhere other than a map click.
+       */
       try {
-        const j = await reverseGeocode({ lat: coords.lat, lon: coords.lon });
+        const result = await reverseGeocode({
+          lat: coords.lat,
+          lon: coords.lon,
+        });
+
         const name =
-          j?.address?.city ||
-          j?.address?.town ||
-          j?.address?.village ||
-          j?.address?.municipality ||
-          j?.address?.state ||
-          j?.display_name ||
+          result?.display_name_en ||
+          result?.name ||
+          result?.display_name ||
           "";
-        setPlace(name);
+
+        if (name) {
+          setPlace(name);
+        }
       } catch {
-        setPlace("");
+        // Keep the current place if reverse geocoding fails.
       }
     } catch (e) {
       setError(e?.message || String(e));
-      if (e?.rateLimit) setRateInfo(e.rateLimit);
+
+      if (e?.rateLimit) {
+        setRateInfo(e.rateLimit);
+      }
+
       setData(null);
-      setPlace("");
     } finally {
       setLoading(false);
     }
@@ -119,7 +195,10 @@ export default function App() {
 
   return (
     <div className="root">
-      <MapPicker value={coords} onPick={setCoords} />
+      <MapPicker
+        value={coords}
+        onPick={onMapPick}
+      />
 
       <WeatherCard
         place={place}
@@ -146,6 +225,3 @@ export default function App() {
     </div>
   );
 }
-
-
-
