@@ -258,7 +258,7 @@ export async function searchLocations(
   const params =
     new URLSearchParams({
       q: query,
-      limit: "5",
+      limit: "10",
     });
 
   const res = await fetch(
