@@ -9,6 +9,8 @@ import {
   searchLocations,
 } from "./api";
 
+import { getLocationLabel } from "./locationLabels";
+
 const FALLBACK_DAILY_LIMIT = 999;
 
 function getUnitSymbol(units) {
@@ -146,11 +148,7 @@ export default function App() {
       reverseControllerRef.current.abort();
     }
 
-    const name =
-      result.display_name_en ||
-      result.name ||
-      result.display_name ||
-      "Selected location";
+    const name = getLocationLabel(result);
 
     setCoords({ lat, lon });
     setPlace(name);

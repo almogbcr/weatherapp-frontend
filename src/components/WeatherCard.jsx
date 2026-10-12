@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import "./WeatherCard.css";
+import { getLocationName, getLocationContext, getLocationLabel } from "../locationLabels";
 
 function getThemeClass(icon) {
   const v = String(icon || "").toLowerCase();
@@ -174,17 +175,21 @@ export default function WeatherCard({
                   className="searchResult"
                   key={`${result.place_id}-${result.lat}-${result.lon}`}
                   type="button"
+                  aria-label={getLocationLabel(result)}
                   onClick={() => {
                     onSelectLocation(result);
                     setExpanded(false);
                   }}
                 >
                   <span className="searchResultName">
-                    {result.display_name_en ||
-                      result.name ||
-                      result.display_name}
+                    {getLocationName(result)}
                   </span>
 
+                  {getLocationContext(result) ? (
+                    <span className="searchResultContext">
+                      {getLocationContext(result)}
+                    </span>
+                  ) : null}
                   <span className="searchResultCoords">
                     {Number(result.lat).toFixed(5)},{" "}
                     {Number(result.lon).toFixed(5)}
