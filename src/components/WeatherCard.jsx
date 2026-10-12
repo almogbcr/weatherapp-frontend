@@ -1,3 +1,4 @@
+import { useId, useState } from "react";
 import "./WeatherCard.css";
 
 function getThemeClass(icon) {
@@ -46,6 +47,8 @@ export default function WeatherCard({
   dailyLimit,
   rateInfo,
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const detailsId = useId();
   const theme = getThemeClass(current?.icon);
 
   const effectiveLimit =
@@ -75,14 +78,28 @@ export default function WeatherCard({
         : "Get Weather";
 
   return (
-    <div className="weatherDock">
+    <div className={`weatherDock ${expanded ? "is-expanded" : "is-collapsed"}`}>
       <div className={`weatherCard ${theme}`}>
+        <button
+          className="weatherToggle"
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={detailsId}
+          onClick={() => setExpanded((value) => !value)}
+        >
+          {expanded ? "Hide details · Show map" : "Search & weather details"}
+          <span aria-hidden="true">{expanded ? "▾" : "▴"}</span>
+        </button>
         <div className="weatherHeader">
           <div className="weatherTitle">
             <div className="weatherPlace">
               {titleText}
             </div>
 
+            <div className="mobileWeatherSummary">
+              {current ? <strong>{current.temp ?? "—"} {unitSymbol}</strong> : null}
+              <span>{current?.description || "Tap the map to choose a location"}</span>
+            </div>
             <div className="weatherMeta">
               <span>{units}</span>
 
@@ -115,6 +132,10 @@ export default function WeatherCard({
           </button>
         </div>
 
+        {!expanded && error ? (
+          <div className="mobileWeatherError" role="alert">{error}</div>
+        ) : null}
+        <div className="weatherDetails" id={detailsId}>
         <div className="weatherControls">
           <form
             className="searchForm"
@@ -153,9 +174,10 @@ export default function WeatherCard({
                   className="searchResult"
                   key={`${result.place_id}-${result.lat}-${result.lon}`}
                   type="button"
-                  onClick={() =>
-                    onSelectLocation(result)
-                  }
+                  onClick={() => {
+                    onSelectLocation(result);
+                    setExpanded(false);
+                  }}
                 >
                   <span className="searchResultName">
                     {result.display_name_en ||
@@ -311,6 +333,7 @@ export default function WeatherCard({
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
