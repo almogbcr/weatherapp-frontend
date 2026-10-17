@@ -39,3 +39,12 @@ jobs:
           tags: almogbcr/weatherapp-frontend:${{ env.SHORT_SHA }}
           build-args: |
             VITE_MAPTILER_API_KEY=${{ secrets.VITE_MAPTILER_API_KEY }}
+
+      - name: Checkout infrastructure repository
+        if: github.ref == 'refs/heads/main'
+        uses: actions/checkout@v5
+        with:
+          repository: almogbcr/weatherapp-infra
+          ref: main
+          token: ${{ secrets.WEATHERAPP_UPDATE }}
+          path: infra
